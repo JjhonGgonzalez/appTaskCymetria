@@ -8,11 +8,18 @@ const myconnection = require('express-myconnection');
 const bodyParser = require('body-parser');
 // Se requiere la librería de mysql para almacenar los datos en la base de datos.
 const mysql = require('mysql');
+const tasksRoutes = require('./routes/tasks');
 
 const app = express();
 
 // Pasar número del puerto
 app.set('port', process.env.PORT || 8080);
+
+app.use(bodyParser.urlencoded({
+  extended:true
+}));
+
+app.use(bodyParser.json());
 
 // Se configura el llamado a las vistas
 app.engine('.hbs', engine({
@@ -24,11 +31,11 @@ app.set('view engine', '.hbs');
 
 // Configurar conexión a base de datos desde RDS AWS 
 app.use(myconnection(mysql, {
-  host: 'crudtasknodejs.cvmya6ewq0lb.us-east-1.rds.amazonaws.com',
+  host: 'crud-task-nodejs.cdi6euka616j.us-east-1.rds.amazonaws.com',
   user: 'admin',
   password: 'root2024',
   port: '3306',
-  database: 'crud_task_nodejs'
+  database: 'crud_nodejs'
 }));
 
 // Middleware para procesar datos en solicitudes HTTP
@@ -39,6 +46,8 @@ app.use(bodyParser.json());
 app.listen(app.get('port'), () => {
   console.log('Escuchando desde el puerto', app.get('port'));
 });
+
+app.use('/', tasksRoutes);
 
 // Se procede a mostrar la vista home
 app.get('/', (req, res) => {
